@@ -32,7 +32,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/.lock') }}
 
       - name: Test
-        run: ./gradlew test
+        run: ./gradlew allTests
 
       - uses: actions/upload-artifact@v4
         if: failure()
