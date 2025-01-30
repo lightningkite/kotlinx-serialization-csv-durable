@@ -1,48 +1,48 @@
-package kotlinx.serialization.csv
+package com.lightningkite.kotlinx.serialization.csv
 
 import kotlin.math.min
 
-data class CsvConfig(
-    val fieldSeparator: Char = ',',
-    val recordSeparator: Char = '\n',
-    val optionalRecordSeparatorPrefix: Char = '\r',
-    val quoteCharacter: Char = '"',
-    val defaultValue: String = "",
+public data class CsvConfig(
+    public val fieldSeparator: Char = ',',
+    public val recordSeparator: Char = '\n',
+    public val optionalRecordSeparatorPrefix: Char = '\r',
+    public val quoteCharacter: Char = '"',
+    public val defaultValue: String = "",
 ) {
-    val quoteCharacterString = "$quoteCharacter"
-    val quoteCharacterString2 = "$quoteCharacter$quoteCharacter"
-    companion object {
-        val default = CsvConfig()
+    internal val quoteCharacterString = "$quoteCharacter"
+    internal val quoteCharacterString2 = "$quoteCharacter$quoteCharacter"
+    public companion object {
+        public val default: CsvConfig = CsvConfig()
     }
 }
 
 
-fun Appendable.appendCsv(values: Sequence<Map<String, String>>, config: CsvConfig = CsvConfig.default) {
+public fun Appendable.appendCsv(values: Sequence<Map<String, String>>, config: CsvConfig = CsvConfig.default) {
     appendCsvRows(sequence {
         val keys = values.flatMap { it.keys }.distinct().toList()
         yield(keys)
         values.forEach { yield(keys.map { k -> it[k] ?: config.defaultValue }) }
     }, config)
 }
-fun Appendable.appendCsv(keys: List<String>, values: Sequence<Map<String, String>>, config: CsvConfig = CsvConfig.default) {
+public fun Appendable.appendCsv(keys: List<String>, values: Sequence<Map<String, String>>, config: CsvConfig = CsvConfig.default) {
     appendCsvRows(sequence {
         yield(keys)
         values.forEach { yield(keys.map { k -> it[k] ?: config.defaultValue }) }
     }, config)
 }
-fun Appendable.startCsv(keys: List<String>, config: CsvConfig = CsvConfig.default): (Map<String, String>)->Unit {
+public fun Appendable.startCsv(keys: List<String>, config: CsvConfig = CsvConfig.default): (Map<String, String>)->Unit {
     appendCsvRow(keys, config)
     return {
         appendCsvRow(keys.map { k -> it[k] ?: config.defaultValue })
     }
 }
 
-fun Appendable.appendCsvRows(sequence: Sequence<List<String>>, config: CsvConfig = CsvConfig.default) {
+public fun Appendable.appendCsvRows(sequence: Sequence<List<String>>, config: CsvConfig = CsvConfig.default) {
     sequence.forEach {
         appendCsvRow(it, config)
     }
 }
-fun Appendable.appendCsvRow(row: List<String>, config: CsvConfig = CsvConfig.default) {
+public fun Appendable.appendCsvRow(row: List<String>, config: CsvConfig = CsvConfig.default) {
     var first = true
     for (value in row) {
         if (first) first = false
@@ -52,7 +52,7 @@ fun Appendable.appendCsvRow(row: List<String>, config: CsvConfig = CsvConfig.def
     this.append(config.recordSeparator)
 }
 
-fun Appendable.appendCsvEscaped(value: String, config: CsvConfig = CsvConfig.default) {
+internal fun Appendable.appendCsvEscaped(value: String, config: CsvConfig = CsvConfig.default) {
     if (value.contains(config.fieldSeparator) || value.contains(config.recordSeparator) || value.contains(config.quoteCharacter)) {
         this.append(config.quoteCharacter)
         this.append(value.replace(config.quoteCharacterString, config.quoteCharacterString2))
@@ -62,7 +62,7 @@ fun Appendable.appendCsvEscaped(value: String, config: CsvConfig = CsvConfig.def
     }
 }
 
-fun Sequence<List<String>>.asMaps(config: CsvConfig = CsvConfig.default): Sequence<Map<String, String>> {
+internal fun Sequence<List<String>>.asMaps(config: CsvConfig = CsvConfig.default): Sequence<Map<String, String>> {
     return sequence {
         val iter = this@asMaps.iterator()
         if (!iter.hasNext()) return@sequence
@@ -76,7 +76,7 @@ fun Sequence<List<String>>.asMaps(config: CsvConfig = CsvConfig.default): Sequen
     }
 }
 
-fun CharIterator.csvLines(config: CsvConfig = CsvConfig.default): Sequence<List<String>> = sequence {
+public fun CharIterator.csvLines(config: CsvConfig = CsvConfig.default): Sequence<List<String>> = sequence {
     val builder = StringBuilder("")
     var inQuotes = false
     var lastWasQuote = false

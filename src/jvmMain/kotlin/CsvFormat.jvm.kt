@@ -1,4 +1,4 @@
-package kotlinx.serialization.csv
+package com.lightningkite.kotlinx.serialization.csv
 
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -6,7 +6,7 @@ import java.io.InputStream
 import java.io.Reader
 
 
-fun <T> CsvFormat.decodeFromReader(deserializer: DeserializationStrategy<T>, reader: Reader): T {
+public fun <T> CsvFormat.decodeFromReader(deserializer: DeserializationStrategy<T>, reader: Reader): T {
     return when (deserializer.descriptor.kind) {
         is StructureKind.LIST -> deserializer.deserialize(
             TopListDecoder(
@@ -18,7 +18,7 @@ fun <T> CsvFormat.decodeFromReader(deserializer: DeserializationStrategy<T>, rea
     }
 }
 
-fun Reader.iterator(): CharIterator = object: CharIterator() {
+public fun Reader.iterator(): CharIterator = object: CharIterator() {
     var buffered = this@iterator.read()
     override fun hasNext(): Boolean = buffered != -1
     override fun nextChar(): Char {
@@ -46,7 +46,7 @@ fun Reader.iterator(): CharIterator = object: CharIterator() {
  * @throws [IOException] If an I/O error occurs and stream cannot be read from.
  */
 @ExperimentalSerializationApi
-fun <T> CsvFormat.decodeToSequence(stream: InputStream, deserializer: DeserializationStrategy<T>): Sequence<T> {
+public fun <T> CsvFormat.decodeToSequence(stream: InputStream, deserializer: DeserializationStrategy<T>): Sequence<T> {
     return stream.reader().iterator().csvLines(csvConfig).asMaps(csvConfig).map {
         StringDeferringDecoder(stringDeferringConfig, deserializer.descriptor, it).decodeSerializableValue(
             deserializer
@@ -63,7 +63,7 @@ fun <T> CsvFormat.decodeToSequence(stream: InputStream, deserializer: Deserializ
  */
 @ExperimentalSerializationApi
 @Deprecated("Use the official header, decodeToSequence", ReplaceWith("this.decodeToSequence(reader.iterator(), deserializer))"))
-fun <T> CsvFormat.decodeSequenceFromReader(deserializer: KSerializer<T>, reader: Reader): Sequence<T> {
+public fun <T> CsvFormat.decodeSequenceFromReader(deserializer: KSerializer<T>, reader: Reader): Sequence<T> {
     return decodeToSequence(reader.iterator(), deserializer)
 }
 
@@ -77,7 +77,7 @@ fun <T> CsvFormat.decodeSequenceFromReader(deserializer: KSerializer<T>, reader:
  * function completes.
  */
 @Deprecated("Use the official header, decodeToSequence", ReplaceWith("this.decodeToSequence(reader.iterator(), deserializer))"))
-fun <T> CsvFormat.decodeFromReaderUsingSequence(
+public fun <T> CsvFormat.decodeFromReaderUsingSequence(
     deserializer: KSerializer<T>,
     reader: Reader,
     handler: (Sequence<T>) -> Unit,

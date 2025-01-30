@@ -1,4 +1,4 @@
-package kotlinx.serialization.csv
+package com.lightningkite.kotlinx.serialization.csv
 
 import kotlinx.serialization.*
 import kotlinx.serialization.builtins.serializer
@@ -7,12 +7,12 @@ import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.*
 import kotlinx.serialization.modules.SerializersModule
 
-class CsvFormat(val stringDeferringConfig: StringDeferringConfig, val csvConfig: CsvConfig = CsvConfig.default) :
+public class CsvFormat(public val stringDeferringConfig: StringDeferringConfig, public val csvConfig: CsvConfig = CsvConfig.default) :
     StringFormat {
     override val serializersModule: SerializersModule
         get() = stringDeferringConfig.serializersModule
 
-    inner class TopListEncoder(val onComplete: (Map<String, String>) -> Unit) : AbstractEncoder() {
+    internal inner class TopListEncoder(val onComplete: (Map<String, String>) -> Unit) : AbstractEncoder() {
         override val serializersModule: SerializersModule
             get() = stringDeferringConfig.serializersModule
 
@@ -40,7 +40,7 @@ class CsvFormat(val stringDeferringConfig: StringDeferringConfig, val csvConfig:
         override fun encodeValue(value: Any) = TODO()
     }
 
-    inner class TopListDecoder(val maps: Iterator<Map<String, String>>) : AbstractDecoder() {
+    internal inner class TopListDecoder(val maps: Iterator<Map<String, String>>) : AbstractDecoder() {
         override val serializersModule: SerializersModule
             get() = stringDeferringConfig.serializersModule
 
@@ -143,7 +143,7 @@ class CsvFormat(val stringDeferringConfig: StringDeferringConfig, val csvConfig:
         }
     }
 
-    fun <T> encodeToAppendable(serializer: SerializationStrategy<T>, value: T, out: Appendable) {
+    public fun <T> encodeToAppendable(serializer: SerializationStrategy<T>, value: T, out: Appendable) {
         return when (serializer.descriptor.kind) {
             StructureKind.LIST -> {
                 val maps = ArrayList<Map<String, String>>()
@@ -159,7 +159,7 @@ class CsvFormat(val stringDeferringConfig: StringDeferringConfig, val csvConfig:
         }
     }
 
-    fun <T> decodeToSequence(charIterator: CharIterator, deserializer: DeserializationStrategy<T>): Sequence<T> {
+    public fun <T> decodeToSequence(charIterator: CharIterator, deserializer: DeserializationStrategy<T>): Sequence<T> {
         return charIterator.csvLines(csvConfig).asMaps(csvConfig).map {
             StringDeferringDecoder(stringDeferringConfig, deserializer.descriptor, it).decodeSerializableValue(
                 deserializer
@@ -168,7 +168,7 @@ class CsvFormat(val stringDeferringConfig: StringDeferringConfig, val csvConfig:
     }
 
     @Deprecated("Use the official header, decodeToSequence", ReplaceWith("this.decodeToSequence(charIterator, deserializer))"))
-    fun <T> decodeSequence(deserializer: DeserializationStrategy<T>, charIterator: CharIterator): Sequence<T> {
+    public fun <T> decodeSequence(deserializer: DeserializationStrategy<T>, charIterator: CharIterator): Sequence<T> {
         return charIterator.csvLines(csvConfig).asMaps(csvConfig).map {
             StringDeferringDecoder(stringDeferringConfig, deserializer.descriptor, it).decodeSerializableValue(
                 deserializer
@@ -183,7 +183,7 @@ class CsvFormat(val stringDeferringConfig: StringDeferringConfig, val csvConfig:
      * @param appendable The output where the CSV will be written.
      * @return a function that writes a T into the appendable
      */
-    fun <T> beginEncodingToAppendable(serializer: SerializationStrategy<T>, out: Appendable): (T) -> Unit {
+    public fun <T> beginEncodingToAppendable(serializer: SerializationStrategy<T>, out: Appendable): (T) -> Unit {
         val add = out.startCsv(
             keys = StringDeferringEncoder(stringDeferringConfig, steadyHeaders = true).headers(serializer.descriptor),
             config = csvConfig
@@ -205,7 +205,7 @@ class CsvFormat(val stringDeferringConfig: StringDeferringConfig, val csvConfig:
      * @param values The [Serializable] objects as a sequence.
      * @param appendable The output where the CSV will be written.
      */
-    fun <T> encodeSequenceToAppendable(serializer: KSerializer<T>, values: Sequence<T>, appendable: Appendable) {
+    public fun <T> encodeSequenceToAppendable(serializer: KSerializer<T>, values: Sequence<T>, appendable: Appendable) {
         appendable.appendCsv(
             keys = StringDeferringEncoder(stringDeferringConfig, steadyHeaders = true).headers(serializer.descriptor),
             values = values.map {

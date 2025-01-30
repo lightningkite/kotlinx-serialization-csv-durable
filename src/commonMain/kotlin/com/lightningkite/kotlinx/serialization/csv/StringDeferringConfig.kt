@@ -1,15 +1,15 @@
-package kotlinx.serialization.csv
+package com.lightningkite.kotlinx.serialization.csv
 
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 
-class StringDeferringConfig(
-    val serializersModule: SerializersModule,
-    val ignoreUnknownKeys: Boolean = false,
-    val nullMarker: String = "null",
-    val deferMarker: String = "%",
-    val deferredFormat: StringFormat = Json {
+public class StringDeferringConfig(
+    public val serializersModule: SerializersModule,
+    public val ignoreUnknownKeys: Boolean = false,
+    public val nullMarker: String = "null",
+    public val deferMarker: String = "%",
+    public val deferredFormat: StringFormat = Json {
         this.serializersModule = serializersModule
         this.ignoreUnknownKeys = ignoreUnknownKeys
         this.explicitNulls = true

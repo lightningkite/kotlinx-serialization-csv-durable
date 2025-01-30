@@ -1,4 +1,4 @@
-package kotlinx.serialization.csv
+package com.lightningkite.kotlinx.serialization.csv
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString

@@ -17,6 +17,7 @@ group = "com.lightningkite"
 version = "1.0-SNAPSHOT"
 
 kotlin {
+    explicitApi()
     applyDefaultHierarchyTemplate()
     jvm {
         compilations.all {
@@ -33,6 +34,9 @@ kotlin {
     macosArm64()
 
     sourceSets {
+        all {
+            languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
+        }
         val commonMain by getting {
             dependencies {
                 api(libs.kotlinXJson)
@@ -53,20 +57,13 @@ kotlin {
                 srcDir(file("build/generated/ksp/common/commonTest/kotlin"))
             }
         }
-        val jvmMain by getting {
-            dependencies {
-            }
-        }
-        val jvmTest by getting {
-            dependsOn(commonTest)
-        }
     }
 }
 
 standardPublishing {
     name.set("KotlinX Serialization CSV Durable")
     description.set("A tool for communication between a server using LightningServer and a client.")
-    github("lightningkite", "kotlinx-serialization-csv-durable")
+    github("lightningkite", "kotlinx-serialization-csv")
 
     licenses {
         mit()

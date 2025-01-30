@@ -1,4 +1,4 @@
-package kotlinx.serialization.csv
+package com.lightningkite.kotlinx.serialization.csv
 
 import kotlinx.serialization.*
 import kotlinx.serialization.builtins.serializer
@@ -11,7 +11,7 @@ import kotlinx.serialization.modules.SerializersModule
  * They neither do have stable API, nor internal invariants and are changed without any warnings.
  */
 @OptIn(InternalSerializationApi::class)
-public class StringDeferringEncoder(
+internal class StringDeferringEncoder(
     val config: StringDeferringConfig,
     val steadyHeaders: Boolean = true,
 ) : Encoder, CompositeEncoder {

@@ -1,4 +1,4 @@
-package kotlinx.serialization.csv
+package com.lightningkite.kotlinx.serialization.csv
 
 
 import kotlinx.serialization.*
@@ -13,7 +13,7 @@ import kotlinx.serialization.modules.SerializersModule
 
 
 @OptIn(InternalSerializationApi::class)
-class StringDeferringDecoder(
+internal class StringDeferringDecoder(
     val config: StringDeferringConfig,
     val descriptor: SerialDescriptor,
     val map: Map<String, String>,
