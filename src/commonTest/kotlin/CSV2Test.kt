@@ -139,7 +139,6 @@ auctionDay,auction,venue,company,auctionDate,city,state,country,wasMigrated,lotN
     @Test
     fun testParse() {
         val serializer = TestObj.serializer()
-        val alt = Json { }
         assertEquals(
             basis,
             StringDeferringDecoder(
