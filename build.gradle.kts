@@ -22,7 +22,7 @@ buildscript {
 group = "com.lightningkite"
 version = "1.0-SNAPSHOT"
 
-val lk = lk(minor = 0) {
+val lk = lk(minor = 1) {
     version = gitBasedVersion().also { println("Determined version to be $it") }
 }
 
