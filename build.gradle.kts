@@ -100,15 +100,63 @@ internal data class GitStatus(
     val workingTreeClean: Boolean,
     val ahead: Int,
     val behind: Int,
-)
-//internal fun File.getGitStatus(): Boolean = runCli("git", "status").let {}
+) {
+    val fullyPushed get() = workingTreeClean && ahead == 0 && behind == 0
+}
+internal fun File.getGitStatus(): GitStatus = runCli("git", "status").let {
+    GitStatus(
+        branch = it.substringAfter("On branch ", "").substringBefore('\n').trim(),
+        workingTreeClean = it.contains("working tree clean", ignoreCase = true),
+        ahead = it.substringAfter("Your branch is ahead", "")
+            .substringAfter('\'')
+            .substringAfter('\'')
+            .substringAfter("by ")
+            .substringBefore(" commits")
+            .toIntOrNull() ?:
+            it.substringBefore(" different commits each, respectively", "")
+                .substringAfter("and have ")
+                .substringAfter(" and ")
+                .toIntOrNull() ?: 0,
+        behind = it.substringAfter("Your branch is behind", "")
+            .substringAfter('\'')
+            .substringAfter('\'')
+            .substringAfter("by ")
+            .substringBefore(" commits")
+            .toIntOrNull() ?:
+        it.substringBefore(" different commits each, respectively", "")
+            .substringAfter("and have ")
+            .substringBefore(" and ")
+            .toIntOrNull() ?: 0,
+    )
+}
 internal fun File.isGitClean(): Boolean = runCli("git", "status").contains("working tree clean", true)
 internal fun File.isGitAhead(): Boolean = runCli("git", "status").contains("Your branch is ahead", true)
 internal fun File.isGitBehind(): Boolean = runCli("git", "status").contains("Your branch is behind", true)
+internal val myPatchNumberFile = rootDir.resolve("versioning/patchVersionNumber.txt").also { it.parentFile!!.mkdirs() }
+internal data class PatchData(val gitHash: String, val number: Int)
+internal fun patchNumber(): PatchData? {
+    val current = myPatchNumberFile.takeIf { it.exists() }?.readText()?.let {
+        PatchData(it.substringBefore('\n').trim(), it.substringAfter('\n').trim().toInt())
+    } ?: PatchData("no commits", 0)
+    if(!rootDir.getGitStatus().fullyPushed) return null
+    val hash = rootDir.getGitHash()
+    return if(hash == current.gitHash) current
+    else {
+        val new = PatchData(hash, current.number + 1)
+        myPatchNumberFile.writeText(new.gitHash + "\n" + new.number)
+        new
+    }
+}
+internal fun gitCreateVersionTag() {
+    val v = gitBasedVersion()
+    if(v.endsWith("snapshot")) throw IllegalStateException()
+    rootDir.runCli("git", "tag", v)
+}
 
 internal fun File.getGitTag(): String? =
     runCli("git", "tag", "--points-at", getGitHash()).trim().takeUnless { it.isBlank() }
 
+val minorVersion: String? by project
 val useBranchSnapshotWhenPublishing: String? by project
 fun gitBasedVersion(): String {
     return if (useBranchSnapshotWhenPublishing?.toBoolean() == true)
@@ -118,8 +166,8 @@ fun gitBasedVersion(): String {
             if(it.startsWith("version-")) it.removePrefix("version-").toIntOrNull() ?: "0"
             else "0"
         }
-        val versionMinor = "1"
-        val versionPatch = if(project.rootDir.isGitClean()) project.rootDir.getGitCommitTime().withOffsetSameInstant(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyyMMddhhmmss"))
+        val versionMinor = minorVersion ?: "0"
+        val versionPatch = if(project.rootDir.getGitStatus().fullyPushed) patchNumber()?.number
         else null
         "${versionMajor}.${versionMinor}" + (versionPatch?.let { ".$it" } ?: "-SNAPSHOT")
     }
