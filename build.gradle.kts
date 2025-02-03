@@ -94,7 +94,18 @@ internal fun File.runCli(vararg args: String): String {
 internal fun File.getGitCommitTime(): OffsetDateTime = OffsetDateTime.parse(runCli("git", "show", "--no-patch", "--format=%ci", "HEAD").trim())
 internal fun File.getGitBranch(): String = runCli("git", "rev-parse", "--abbrev-ref", "HEAD").trim()
 internal fun File.getGitHash(): String = runCli("git", "rev-parse", "--short", "HEAD").trim()
+
+internal data class GitStatus(
+    val branch: String,
+    val workingTreeClean: Boolean,
+    val ahead: Int,
+    val behind: Int,
+)
+//internal fun File.getGitStatus(): Boolean = runCli("git", "status").let {}
 internal fun File.isGitClean(): Boolean = runCli("git", "status").contains("working tree clean", true)
+internal fun File.isGitAhead(): Boolean = runCli("git", "status").contains("Your branch is ahead", true)
+internal fun File.isGitBehind(): Boolean = runCli("git", "status").contains("Your branch is behind", true)
+
 internal fun File.getGitTag(): String? =
     runCli("git", "tag", "--points-at", getGitHash()).trim().takeUnless { it.isBlank() }
 
