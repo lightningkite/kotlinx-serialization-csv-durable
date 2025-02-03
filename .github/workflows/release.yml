@@ -1,13 +1,14 @@
-name: release
+name: snapshot
 
 on:
   push:
-    tags:
-      - '*'
+    branches:
+      - main
+      - version-**
 
 jobs:
   release:
-    name: Test and Upload Release
+    name: Test and Upload SnapShot
     runs-on: macos-latest
     steps:
 
@@ -31,6 +32,9 @@ jobs:
             ~/.konan
           key: ${{ runner.os }}-${{ hashFiles('**/.lock') }}
 
+      - name: Clean
+        run: ./gradlew clean
+
       - name: Test
         run: ./gradlew allTests
 
@@ -49,4 +53,4 @@ jobs:
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-        run: ./gradlew publishAllPublicationsToSonatypeRepository
+        run: ./gradlew publishAllPublicationsToLightningKiteRepository
