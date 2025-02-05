@@ -2,7 +2,7 @@
 [versions]
 kotlin = "2.0.21"
 kotlinXSerialization = "1.7.3"
-sample = "SNAPSHOT"
+sample = "SNAPSHOTx"
 
 [libraries]
 deployHelpers = { module = "com.lightningkite:deploy-helpers", version = "0.0.7" }
