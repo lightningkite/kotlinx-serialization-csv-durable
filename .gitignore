@@ -35,3 +35,5 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+local.version.txt
