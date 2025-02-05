@@ -1,15 +1,16 @@
+
 [versions]
-kotlinXSerialization="1.7.3"
-kotlin="2.0.21"
+kotlin = "2.0.21"
+kotlinXSerialization = "1.7.3"
 
 [libraries]
-kotlinXJson={module="org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref="kotlinXSerialization"}
-serializationProperties={module="org.jetbrains.kotlinx:kotlinx-serialization-properties", version.ref="kotlinXSerialization"}
-kotlinCompiler={module="org.jetbrains.kotlin:kotlin-compiler", version.ref="kotlin"}
-kotlinStdLib={module="org.jetbrains.kotlin:kotlin-stdlib", version.ref="kotlin"}
-kotlinTest={module="org.jetbrains.kotlin:kotlin-test-junit", version.ref="kotlin"}
-deployHelpers={module="com.lightningkite:deploy-helpers", version="0.0.7"}
+deployHelpers = { module = "com.lightningkite:deploy-helpers", version = "0.0.7" }
+kotlinCompiler = { module = "org.jetbrains.kotlin:kotlin-compiler", version = { ref = "kotlin" } }
+kotlinStdLib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version = { ref = "kotlin" } }
+kotlinTest = { module = "org.jetbrains.kotlin:kotlin-test-junit", version = { ref = "kotlin" } }
+kotlinXJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = { ref = "kotlinXSerialization" } }
+serializationProperties = { module = "org.jetbrains.kotlinx:kotlinx-serialization-properties", version = { ref = "kotlinXSerialization" } }
 
 [plugins]
-kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-serialization={id="org.jetbrains.kotlin.plugin.serialization", version.ref="kotlin"}
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version = { ref = "kotlin" } }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version = { ref = "kotlin" } }
