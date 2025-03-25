@@ -2,11 +2,11 @@ package com.lightningkite.kotlinx.serialization.csv
 
 import kotlinx.serialization.*
 import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 import kotlin.test.fail
 
 class CSV2Test {
@@ -33,6 +33,23 @@ class CSV2Test {
     }
 
     @Test
+    fun testCsvLinesTrimmedValues() {
+        val expected = listOf(
+            listOf("Test", "Outside", "Quote\"Escape", "retarded\nquoting", "more"),
+            listOf("why"),
+        )
+        val input = "\"Test\",Outside,\"Quote\"\"Escape\",\"retarded\nquoting\",more\r\n\n  \t\t why  \t\t  "
+        assertEquals(
+            expected ,
+            input.iterator().csvLines(CsvConfig.default.copy(trimWhiteSpace = true)).toList()
+        )
+        assertNotEquals(
+            expected,
+            input.iterator().csvLines(CsvConfig.default.copy(trimWhiteSpace = false)).toList()
+        )
+    }
+
+    @Test
     fun testCsvLines2() {
         """
 auctionDay,auction,venue,company,auctionDate,city,state,country,wasMigrated,lotNumber,sortOrder,lotType,year,make,model,bodyStyle,trim,engine,provenance,interiorColor,exteriorColor,odometer,odometer.amount,odometer.unit,vin,link,externalImages,charity,custom,ignoreInPortfolios,sublots,reserve,estimatedHighPrice,estimatedHighPrice.without.currency,estimatedHighPrice.without.original,estimatedLowPrice,estimatedLowPrice.without.currency,estimatedLowPrice.without.original
@@ -51,6 +68,17 @@ auctionDay,auction,venue,company,auctionDate,city,state,country,wasMigrated,lotN
                 mapOf("a" to "4", "b" to "5", "c" to "6"),
             ),
             sequenceOf(listOf("a", "b", "c"), listOf("1", "2", "3"), listOf("4", "5", "6")).asMaps().toList()
+        )
+    }
+
+    @Test
+    fun testAsMapsTrimmedHeaders() {
+        assertEquals(
+            listOf(
+                mapOf("a" to "1", "b" to "2", "c" to "3"),
+                mapOf("a" to "4", "b" to "5", "c" to "6"),
+            ),
+            sequenceOf(listOf("a   ", "   b", " \tc\t\t "), listOf("1", "2", "3"), listOf("4", "5", "6")).asMaps().toList()
         )
     }
 

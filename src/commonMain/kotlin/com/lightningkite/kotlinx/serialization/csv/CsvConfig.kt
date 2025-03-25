@@ -8,9 +8,11 @@ public data class CsvConfig(
     public val optionalRecordSeparatorPrefix: Char = '\r',
     public val quoteCharacter: Char = '"',
     public val defaultValue: String = "",
+    public val trimWhiteSpace: Boolean = true, // Will remove any leading and tailing white space from ALL values.
 ) {
     internal val quoteCharacterString = "$quoteCharacter"
     internal val quoteCharacterString2 = "$quoteCharacter$quoteCharacter"
+
     public companion object {
         public val default: CsvConfig = CsvConfig()
     }
@@ -24,13 +26,22 @@ public fun Appendable.appendCsv(values: Sequence<Map<String, String>>, config: C
         values.forEach { yield(keys.map { k -> it[k] ?: config.defaultValue }) }
     }, config)
 }
-public fun Appendable.appendCsv(keys: List<String>, values: Sequence<Map<String, String>>, config: CsvConfig = CsvConfig.default) {
+
+public fun Appendable.appendCsv(
+    keys: List<String>,
+    values: Sequence<Map<String, String>>,
+    config: CsvConfig = CsvConfig.default,
+) {
     appendCsvRows(sequence {
         yield(keys)
         values.forEach { yield(keys.map { k -> it[k] ?: config.defaultValue }) }
     }, config)
 }
-public fun Appendable.startCsv(keys: List<String>, config: CsvConfig = CsvConfig.default): (Map<String, String>)->Unit {
+
+public fun Appendable.startCsv(
+    keys: List<String>,
+    config: CsvConfig = CsvConfig.default,
+): (Map<String, String>) -> Unit {
     appendCsvRow(keys, config)
     return {
         appendCsvRow(keys.map { k -> it[k] ?: config.defaultValue })
@@ -42,6 +53,7 @@ public fun Appendable.appendCsvRows(sequence: Sequence<List<String>>, config: Cs
         appendCsvRow(it, config)
     }
 }
+
 public fun Appendable.appendCsvRow(row: List<String>, config: CsvConfig = CsvConfig.default) {
     var first = true
     for (value in row) {
@@ -66,12 +78,13 @@ internal fun Sequence<List<String>>.asMaps(config: CsvConfig = CsvConfig.default
     return sequence {
         val iter = this@asMaps.iterator()
         if (!iter.hasNext()) return@sequence
-        val keys = iter.next()
+        val keys = iter.next().map { it.trim() }
         while (iter.hasNext()) {
             val values = iter.next()
-            yield((0 until min(keys.size, values.size)).asSequence().filter { values[it] != config.defaultValue }.associate {
-                keys[it] to values[it]
-            })
+            yield((0 until min(keys.size, values.size))
+                .asSequence()
+                .filter { values[it] != config.defaultValue }
+                .associate { keys[it] to values[it] })
         }
     }
 }
@@ -83,6 +96,14 @@ public fun CharIterator.csvLines(config: CsvConfig = CsvConfig.default): Sequenc
     var listBuilder = ArrayList<String>()
     var lastWasNewline = true
     var lastWasPrefix = false
+
+    fun addToList(value:String){
+        if(config.trimWhiteSpace)
+            listBuilder.add(value.trim())
+        else
+            listBuilder.add(value)
+    }
+
     this@csvLines.forEach {
         if (lastWasPrefix && it != config.recordSeparator) builder.append(config.optionalRecordSeparatorPrefix)
         lastWasPrefix = false
@@ -105,14 +126,14 @@ public fun CharIterator.csvLines(config: CsvConfig = CsvConfig.default): Sequenc
                 inQuotes = true
             } else if (it == config.fieldSeparator) {
                 lastWasNewline = false
-                listBuilder.add(builder.toString())
+                addToList(builder.toString())
                 builder.clear()
             } else if (it == config.optionalRecordSeparatorPrefix) {
                 // ignore
                 lastWasPrefix = true
             } else if (it == config.recordSeparator) {
                 if (!lastWasNewline) {
-                    listBuilder.add(builder.toString())
+                    addToList(builder.toString())
                     builder.clear()
                     yield(listBuilder)
                     listBuilder = ArrayList()
@@ -125,7 +146,7 @@ public fun CharIterator.csvLines(config: CsvConfig = CsvConfig.default): Sequenc
         }
     }
     if (!lastWasNewline) {
-        listBuilder.add(builder.toString())
+        addToList(builder.toString())
         builder.clear()
         yield(listBuilder)
         listBuilder = ArrayList()
