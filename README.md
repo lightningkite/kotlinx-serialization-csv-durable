@@ -1,5 +1,27 @@
 # KotlinX Serialization CSV Durable
 
+Written in pure Kotlin common code, published for:
+
+- jvm (Android compatible)
+- js
+- iosX64
+- iosArm64
+- iosSimulatorArm64
+- macosX64
+- macosArm64
+
+```kotlin
+// build.gradle.kts
+repositories {
+    maven("https://lightningkite-maven.s3.us-west-2.amazonaws.com")
+}
+dependencies {
+    //...
+    api("com.lightningkite:kotlinx-serialization-csv-durable:0.2.7")
+    //...
+}
+```
+
 A serialization scheme for CSVs that is *durable*, meaning that it is meant to work for all cases (sublists, polymorphism) without failure.
 
 To accomplish this, types that cannot be represented using CSVs (due to indeterminate column count) are encoded using a fallback string format (JSON by default).
