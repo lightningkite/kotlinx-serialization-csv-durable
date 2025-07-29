@@ -18,7 +18,7 @@ public fun <T> CsvFormat.decodeFromReader(deserializer: DeserializationStrategy<
     }
 }
 
-public fun Reader.iterator(): CharIterator = object: CharIterator() {
+internal fun Reader.iterator(): CharIterator = object: CharIterator() {
     var buffered = this@iterator.read()
     override fun hasNext(): Boolean = buffered != -1
     override fun nextChar(): Char {

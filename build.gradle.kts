@@ -1,11 +1,11 @@
 import com.lightningkite.deployhelpers.*
-import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.serialization)
     id("signing")
-    id("com.vanniktech.maven.publish") version "0.30.0"
+    alias(libs.plugins.vannitechPublishing)
+    alias(libs.plugins.dokka)
     `maven-publish`
 }
 
@@ -15,14 +15,15 @@ buildscript {
         maven("https://lightningkite-maven.s3.us-west-2.amazonaws.com")
     }
     dependencies {
-        classpath("com.lightningkite:lk-gradle-helpers:1.0.8")
+        classpath("com.lightningkite:lk-gradle-helpers:3.0.0")
     }
 }
 
 group = "com.lightningkite"
-version = "1.0-SNAPSHOT"
-
-val lk = lk {}
+useGitBasedVersion()
+useLocalDependencies()
+publishing()
+setupDokka("lightningkite", "kotlinx-serialization-csv-durable")
 
 kotlin {
     jvmToolchain(17)
@@ -68,13 +69,13 @@ kotlin {
 }
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    publishToMavenCentral(automaticRelease = true)
     signAllPublications()
-    coordinates(group.toString(), name, version.toString())
     pom {
         name.set("KotlinX Serialization CSV Durable")
-        description.set("A tool for communication between a server using LightningServer and a client.")
+        description.set("A format for KotlinX Serialization that handles CSV files with a header row.")
         github("lightningkite", "kotlinx-serialization-csv-durable")
+        url.set(dokkaPublicHostingIndex)
         licenses { mit() }
         developers {
             joseph()
@@ -82,3 +83,4 @@ mavenPublishing {
         }
     }
 }
+
