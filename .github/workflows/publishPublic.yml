@@ -2,8 +2,7 @@ name: snapshot
 
 on:
   push:
-    tags:
-      - *
+    tags: ['*']
 
 jobs:
   release:
@@ -52,6 +51,8 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
           ORG_GRADLE_PROJECT_lightningKiteMavenAwsAccessKey: AKIARR4DEGXXROVKYNNP
           ORG_GRADLE_PROJECT_lightningKiteMavenAwsSecretAccessKey: ${{ secrets.MAVENS3SECRETKEY }}
         run: ./gradlew publishPublic
