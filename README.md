@@ -1,5 +1,7 @@
 # KotlinX Serialization CSV Durable
 
+[![Maven Central Version](https://img.shields.io/maven-central/v/com.lightningkite/kotlinx-serialization-csv-durable)](https://central.sonatype.com/artifact/com.lightningkite/kotlinx-serialization-csv-durable)
+
 Written in pure Kotlin common code, published for:
 
 - jvm (Android compatible)
