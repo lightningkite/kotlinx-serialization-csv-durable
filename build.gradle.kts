@@ -15,15 +15,11 @@ buildscript {
         maven("https://lightningkite-maven.s3.us-west-2.amazonaws.com")
     }
     dependencies {
-        classpath("com.lightningkite:lk-gradle-helpers:3.0.7")
+        classpath("com.lightningkite:lk-gradle-helpers:4.0.0")
     }
 }
 
 group = "com.lightningkite"
-useGitBasedVersion()
-useLocalDependencies()
-publishing()
-setupDokka("lightningkite", "kotlinx-serialization-csv-durable")
 
 kotlin {
     jvmToolchain(17)
@@ -68,19 +64,6 @@ kotlin {
     }
 }
 
-mavenPublishing {
-    publishToMavenCentral(automaticRelease = true)
-    signAllPublications()
-    pom {
-        name.set("KotlinX Serialization CSV Durable")
-        description.set("A format for KotlinX Serialization that handles CSV files with a header row.")
-        github("lightningkite", "kotlinx-serialization-csv-durable")
-        url.set(dokkaPublicHostingIndex)
-        licenses { mit() }
-        developers {
-            joseph()
-            brady()
-        }
-    }
+lkLibrary("lightningkite", "kotlinx-serialization-csv-durable") {
+    description.set("A format for KotlinX Serialization that handles CSV files with a header row.")
 }
-
